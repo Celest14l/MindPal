@@ -75,5 +75,5 @@ MindPal provides a safe, judgment-free AI companion that:
 
 1. **Clone the Repo**
    ```bash
-   git clone https://github.com/yourusername/mindpal.git
-   cd mindpal
+   git clone https://github.com/Celest14l/MindPal.git
+   cd MindPal
