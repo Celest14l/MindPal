@@ -26,7 +26,8 @@ MindPal provides a safe, judgment-free AI companion that:
 - Flags critical messages and redirects to **crisis resources**.
 
 ---
-
+## Demo
+Link : https://youtu.be/0_L0q8raDkw
 ## 🎯 Use Cases
 
 - Daily mood check-ins and emotional tracking
