@@ -1,0 +1,16 @@
+2025-04-12 19:33:00: Unexpected error in /chat_pa route: name 'ltm_facts' is not defined
+Traceback (most recent call last):
+  File "D:\MINDpal\app.py", line 543, in chat
+    dynamic_system_content = create_mindpal_prompt(text_sentiment_tag, voice_sentiment_tag, is_vent_mode, long_term_memory) # Pass LTM
+  File "D:\MINDpal\app.py", line 321, in create_mindpal_prompt
+    Respond empathetically to the user's input, considering their likely mood indicated by their words as **{text_sentiment_tag}**. Acknowledge their feelings. Refer to remembered facts ({ltm_facts}) naturally if relevant. You may gently offer relevant activity suggestions based on their mood if it feels appropriate, but don't force it. Engage naturally in supportive conversation.
+NameError: name 'ltm_facts' is not defined. Did you mean: 'ltm_data'?
+
+2025-04-12 19:38:25: Unexpected error in /chat_pa route: bad operand type for unary +: 'str'
+Traceback (most recent call last):
+  File "D:\MINDpal\app.py", line 602, in chat
+    dynamic_system_content = create_mindpal_prompt(text_sentiment_tag, voice_sentiment_tag, is_vent_mode, long_term_memory)
+  File "D:\MINDpal\app.py", line 344, in create_mindpal_prompt
+    + mode_instruction \
+TypeError: bad operand type for unary +: 'str'
+

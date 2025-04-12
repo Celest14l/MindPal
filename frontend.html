@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MindPal - Wellness Companion</title>
+  <link rel="icon" href="data:;base64,iVBORw0KGgo="> <!-- Consider adding a MindPal icon -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Changed Font: Using Nunito Sans for a softer feel -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <style>
+    /* --- CSS Variables for MindPal Theming --- */
+    :root {
+      --bg-main: #f4f7f6; /* Lighter background */
+      --bg-gradient-end: #e8f0f0;
+      --bg-chat: #ffffff;
+      --bg-chat-header: #e8f0f0; /* Soft header background */
+      --bg-chat-messages: #ffffff;
+      --bg-chat-input: #f8fafa;
+      --bg-input-field: #eef3f3;
+      --bg-button: #4db6ac; /* Teal/Aqua button */
+      --bg-button-hover: #6cc4b8;
+      --bg-button-active-voice: #ff8a65; /* Soft coral for active voice */
+      --bg-animation: #e0eaea; /* Calmer animation background */
+      --bg-message-user: #4db6ac; /* User message matches button */
+      --bg-message-bot: #e8f0f0; /* Soft bot message background */
+      --text-main: #37474f; /* Dark grey text */
+      --text-header: #00695c; /* Darker teal for header */
+      --text-button: #ffffff;
+      --text-user-message: #ffffff;
+      --text-bot-message: #37474f;
+      --text-placeholder: #78909c; /* Lighter placeholder */
+      --border-color: #cfd8dc; /* Soft grey border */
+      --border-focus: #4db6ac;
+      --shadow-color: rgba(77, 182, 172, 0.4); /* Shadow matches button */
+      --shadow-glow: rgba(77, 182, 172, 0.2);
+      --shadow-chat: rgba(100, 100, 100, 0.15);
+      --scrollbar-thumb: #a7c7c2; /* Softer scrollbar */
+      --scrollbar-track: #eef3f3;
+      --typing-dot-color: #4db6ac;
+      --mic-level-color: linear-gradient(180deg, #80cbc4, #4db6ac); /* Teal gradient */
+      --mic-level-glow: rgba(77, 182, 172, 0.5);
+      /* Removed music player vars */
+      --hud-particle-color: rgba(77, 182, 172, 0.5); /* Calmer particles */
+    }
+
+    /* --- General Styles --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      /* Updated Font Family */
+      font-family: 'Nunito Sans', 'Roboto Mono', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      overflow: hidden;
+    }
+    .main-container {
+      display: flex;
+      height: 100vh;
+      background: linear-gradient(135deg, var(--bg-main), var(--bg-gradient-end));
+    }
+
+    /* --- Animation Container (Simplified) --- */
+    .animation-container {
+      flex: 3; /* Adjust flex ratio as needed */
+      border-right: 1px solid var(--border-color); /* Softer border */
+      transition: border-right-color 0.3s ease-in-out;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--bg-animation); /* Use variable */
+      position: relative;
+      overflow: hidden;
+    }
+     /* Removed JARVIS idle state and complex effects */
+    #assistant-animation {
+      display: block;
+      max-width: 90%;
+      max-height: 90%;
+      /* Removed drop shadow for a cleaner look */
+    }
+
+    /* --- Chat Container --- */
+    .chat-container {
+      flex: 2; /* Adjust flex ratio */
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-chat);
+      box-shadow: -5px 0 15px var(--shadow-chat); /* Softer shadow */
+      animation: slideIn 0.5s ease-out;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .chat-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 22px; /* Slightly smaller */
+      font-weight: 700;
+      color: var(--text-header);
+      background: var(--bg-chat-header);
+      text-align: center;
+      position: relative;
+      /* Removed memory indicator related styles */
+      text-shadow: none; /* Cleaner look */
+    }
+    /* Removed header hover effect */
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: var(--bg-chat-messages);
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    }
+    .chat-messages::-webkit-scrollbar {
+      width: 8px;
+    }
+    .chat-messages::-webkit-scrollbar-track {
+      background: var(--scrollbar-track);
+    }
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border-radius: 4px;
+    }
+
+    .message {
+      margin-bottom: 15px;
+      padding: 10px 15px; /* Slightly smaller padding */
+      border-radius: 18px; /* More rounded */
+      max-width: 85%;
+      word-wrap: break-word;
+      animation: messageSlide 0.4s ease-out;
+      line-height: 1.5; /* Better readability */
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Subtle shadow */
+      transition: none; /* Removed hover transform */
+    }
+
+    @keyframes messageSlide {
+      from { transform: translateY(15px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .message.user {
+      background: var(--bg-message-user);
+      color: var(--text-user-message);
+      margin-left: auto;
+      text-align: left; /* Align left for readability */
+    }
+    .message.bot {
+      background: var(--bg-message-bot);
+      color: var(--text-bot-message);
+      margin-right: auto;
+      text-align: left;
+    }
+    .message.status { /* Status messages */
+      font-style: italic;
+      font-size: 0.9em;
+      opacity: 0.8;
+      background: transparent;
+      color: var(--text-placeholder);
+      box-shadow: none;
+      padding: 5px 15px;
+      margin-bottom: 10px;
+      text-align: left;
+      border: none;
+    }
+
+    .typing-indicator span { /* Typing indicator style */
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin: 0 2px;
+      background: var(--typing-dot-color);
+      border-radius: 50%;
+      animation: typing-dots 1.4s infinite ease-in-out; /* Slower animation */
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing-dots { /* Softer pulse */
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+      40% { transform: scale(1.0); opacity: 1; }
+    }
+
+    #status-container {
+      padding: 0 20px 5px 20px;
+      text-align: left;
+      min-height: 20px;
+      background: var(--bg-chat-messages); /* Match messages background */
+    }
+
+    /* Removed music player styles */
+
+    .chat-input-wrapper { /* Wrapper for input and checkbox */
+      border-top: 1px solid var(--border-color);
+      padding: 15px;
+      background: var(--bg-chat-input);
+      animation: fadeIn 1s ease-in;
+    }
+
+    .chat-input {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px; /* Space for checkbox */
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 10px 18px; /* Adjusted padding */
+      border: 1px solid var(--border-color);
+      border-radius: 20px; /* Rounded */
+      background: var(--bg-input-field);
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: none; /* Removed inset shadow */
+    }
+    /* Removed input.listening styles */
+    .chat-input input::placeholder {
+      color: var(--text-placeholder);
+      transition: opacity 0.3s ease;
+    }
+    .chat-input input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 8px var(--shadow-glow); /* Softer glow */
+    }
+    /* Removed pulsing animations */
+
+    .chat-input button {
+      padding: 10px;
+      width: 40px; /* Slightly smaller */
+      height: 40px;
+      margin-left: 10px;
+      border: none;
+      background: var(--bg-button);
+      color: var(--text-button);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      font-size: 16px; /* Adjusted size */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
+    }
+    .chat-input button:hover {
+      background: var(--bg-button-hover);
+      transform: translateY(-1px); /* Subtle lift */
+      box-shadow: 0 4px 8px var(--shadow-glow);
+    }
+    .chat-input button:active {
+      transform: scale(0.95);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    /* Removed ripple effect */
+
+    button#voice-btn {
+      position: relative;
+    }
+    /* Removed rotating ring */
+    button#voice-btn.active {
+      background: var(--bg-button-active-voice);
+      animation: voicePulse 1.2s infinite ease-in-out; /* Slower pulse */
+      box-shadow: 0 0 15px var(--mic-level-glow);
+    }
+    #mic-level-indicator { /* Mic level viz style */
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 0%;
+      background: var(--mic-level-color);
+      opacity: 0.7; /* Softer opacity */
+      transition: height 0.1s ease-out;
+      border-bottom-left-radius: 50%;
+      border-bottom-right-radius: 50%;
+      pointer-events: none;
+      box-shadow: 0 0 10px var(--mic-level-glow);
+    }
+    /* Adjusted voice pulse */
+    @keyframes voicePulse {
+      0% { box-shadow: 0 0 8px var(--mic-level-glow); transform: scale(1); }
+      50% { box-shadow: 0 0 18px var(--mic-level-glow); transform: scale(1.1); }
+      100% { box-shadow: 0 0 8px var(--mic-level-glow); transform: scale(1); }
+    }
+    /* Removed wave effect */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Vent Mode Checkbox */
+    .vent-mode-control {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end; /* Position to the right */
+      font-size: 0.9em;
+      color: var(--text-placeholder);
+      cursor: pointer;
+    }
+    .vent-mode-control input[type="checkbox"] {
+      margin-right: 6px;
+      cursor: pointer;
+      accent-color: var(--bg-button); /* Match button color */
+    }
+    .vent-mode-control label:hover {
+      color: var(--text-main);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <div class="animation-container" id="animation-container">
+      <!-- Changed canvas ID for clarity -->
+      <canvas id="mindpal-animation" width="500" height="500"></canvas>
+    </div>
+    <div class="chat-container">
+      <div class="chat-header">
+        <!-- Changed Header Text -->
+        <span>MindPal</span>
+        <!-- Removed Memory Indicator -->
+      </div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div id="status-container"></div>
+      <!-- Removed Music Player Container -->
+      <div class="chat-input-wrapper">
+          <div class="chat-input">
+            <!-- Updated Placeholder Text -->
+            <input type="text" id="user-input" placeholder="How are you feeling? Type or use voice..." />
+            <!-- Updated Button Title -->
+            <button id="send-btn" title="Send">➤</button>
+            <!-- Updated Button Title -->
+            <button id="voice-btn" title="Speak your mind">
+              🎤
+              <div id="mic-level-indicator"></div>
+            </button>
+          </div>
+          <!-- Added Vent Mode Checkbox -->
+          <div class="vent-mode-control">
+            <input type="checkbox" id="vent-mode-checkbox">
+            <label for="vent-mode-checkbox">Vent Mode (Just listen)</label>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="tts-audio" style="display: none;"></audio>
+
+  <script>
+    // --- DOM Elements ---
+    const chatMessages = document.getElementById("chat-messages");
+    const inputField = document.getElementById("user-input");
+    const sendButton = document.getElementById("send-btn");
+    const voiceButton = document.getElementById("voice-btn");
+    const ttsAudio = document.getElementById("tts-audio");
+    const animationContainer = document.getElementById("animation-container");
+    // Updated canvas element reference
+    const canvas = document.getElementById("mindpal-animation");
+    const ctx = canvas ? canvas.getContext("2d") : null;
+    const micLevelIndicator = document.getElementById("mic-level-indicator");
+    const statusContainer = document.getElementById("status-container");
+    // Added Vent Mode Checkbox element
+    const ventModeCheckbox = document.getElementById("vent-mode-checkbox");
+
+    // Removed music player and memory indicator elements
+
+    // --- Backend URL ---
+    const backendUrl = ""; // Configure if deploying backend separately
+
+    // --- State Variables ---
+    let isAnimating = false; // Controls the new animation
+    let animationFrameId = null;
+    let currentStatusMessage = null;
+    // Removed hasShortTermMemory
+    let particles = []; // For the new animation
+    // Animation state variables removed/simplified
+
+    // --- Web Audio API for Mic Level ---
+    let audioContext = null;
+    let analyser = null;
+    let microphone = null;
+    let javascriptNode = null;
+    let micVizFrameId = null;
+
+    // --- Speech Recognition ---
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isRecognizing = false;
+
+    // --- Initial Load ---
+    window.onload = function() {
+      fetchWelcomeMessage();
+      if (canvas) {
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        // Optionally start a subtle background animation immediately
+        // startAnimation();
+      } else {
+        console.warn("MindPal animation canvas not found.");
+      }
+      inputField.focus();
+      setupSpeechRecognition();
+    };
+
+    function fetchWelcomeMessage() {
+      fetch(`${backendUrl}/welcome_pa`)
+        .then(response => response.json())
+        .then(data => {
+          addMessage("bot", data.response);
+          playTtsAudio(data.audio_url);
+        })
+        .catch(error => {
+          console.error("Error fetching welcome message:", error);
+          // Updated error message
+          addMessage("bot", "Sorry, I couldn't connect to MindPal right now.");
+        });
+    }
+
+    // --- Event Listeners ---
+    sendButton.addEventListener("click", handleSendMessage);
+    inputField.addEventListener("keyup", event => { if (event.key === "Enter") handleSendMessage(); });
+    voiceButton.addEventListener("click", toggleVoiceInput);
+    // Keep TTS listeners, but maybe don't start animation on play
+    ttsAudio.addEventListener('play', () => console.log("TTS Playing")); // Simplified
+    ttsAudio.addEventListener('ended', () => console.log("TTS Ended")); // Simplified
+    ttsAudio.addEventListener('pause', () => console.log("TTS Paused"));
+    ttsAudio.addEventListener('error', () => console.error("TTS Error"));
+    // Removed music player listeners
+
+    // --- Canvas & Animation (Simplified Particle Animation) ---
+    function resizeCanvas() {
+      if (!animationContainer || !canvas) return;
+      const containerWidth = animationContainer.clientWidth;
+      const containerHeight = animationContainer.clientHeight;
+      // Make canvas fill the container for background effect
+      canvas.width = containerWidth;
+      canvas.height = containerHeight;
+      // Re-initialize particles on resize if needed
+      initializeParticles();
+    }
+
+    function initializeParticles() {
+        if (!canvas) return;
+        const particleCount = 50; // Adjust density
+        particles = [];
+        const particleColor = getComputedStyle(document.documentElement).getPropertyValue('--hud-particle-color').trim();
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 2 + 1, // Smaller particles
+            speedX: (Math.random() - 0.5) * 0.3, // Slower speed
+            speedY: (Math.random() - 0.5) * 0.3,
+            color: particleColor, // Use variable
+            opacity: Math.random() * 0.4 + 0.1 // More subtle
+            });
+      }
+    }
+
+    function startAnimation() { // Keep function name for potential future use, but simplify
+        if (isAnimating || !ctx) return;
+        console.log("Starting MindPal animation...");
+        isAnimating = true;
+        animationContainer.classList.remove('idle'); // Ensure idle class is removed if used elsewhere
+        initializeParticles(); // Make sure particles are ready
+        animate();
+    }
+
+    function stopAnimation() { // Keep function name
+        if (!isAnimating) return;
+        console.log("Stopping MindPal animation.");
+        isAnimating = false;
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+        }
+        // Optional: clear canvas on stop? Or let it fade?
+        // if (ctx) {
+        //   ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // }
+    }
+
+    function animate() { // Simplified animation loop
+        if (!isAnimating || !ctx) {
+            // Ensure animation stops if isAnimating becomes false
+             if (animationFrameId) cancelAnimationFrame(animationFrameId);
+             animationFrameId = null;
+            return;
+        };
+
+        // Subtle background clear for fading effect
+        ctx.fillStyle = 'rgba(244, 247, 246, 0.1)'; // Use bg-main with low alpha
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(p => {
+            // Move particle
+            p.x += p.speedX;
+            p.y += p.speedY;
+
+            // Wrap around edges
+            if (p.x < -p.size) p.x = canvas.width + p.size;
+            if (p.x > canvas.width + p.size) p.x = -p.size;
+            if (p.y < -p.size) p.y = canvas.height + p.size;
+            if (p.y > canvas.height + p.size) p.y = -p.size;
+
+            // Draw particle
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = p.color; // Already has alpha
+            ctx.globalAlpha = p.opacity;
+            ctx.fill();
+        });
+        ctx.globalAlpha = 1; // Reset global alpha
+
+        animationFrameId = requestAnimationFrame(animate);
+    }
+    // Start animation on load for background effect
+    window.addEventListener('load', () => {
+        if(canvas) startAnimation();
+    });
+
+
+    // --- Speech Recognition Setup ---
+    // setupSpeechRecognition remains largely the same, but update placeholder text
+    function setupSpeechRecognition() {
+      if (SpeechRecognition) {
+        try {
+          recognition = new SpeechRecognition();
+          recognition.continuous = false;
+          recognition.lang = 'en-US';
+          recognition.interimResults = false; // Don't show interim results
+          recognition.maxAlternatives = 1;
+          recognition.onstart = () => {
+            isRecognizing = true;
+            voiceButton.classList.add('active');
+            voiceButton.title = "Stop Listening";
+            // Updated placeholder
+            inputField.placeholder = "Listening... How are you feeling?";
+            inputField.classList.add('listening'); // Re-add if needed for styling
+            startMicVisualization();
+          };
+          recognition.onresult = (event) => {
+            const transcript = event.results[event.results.length - 1][0].transcript.trim();
+            if (transcript) {
+              inputField.value = transcript;
+              // Maybe stop immediately after result? Depends on desired UX
+              // recognition.stop();
+            }
+          };
+          recognition.onerror = (event) => {
+            console.error("Speech recognition error:", event.error);
+            let errorMsg = `⚠️ Speech recognition error: ${event.error}`;
+            if(event.error === 'no-speech') {
+                errorMsg = "I didn't hear anything. Try speaking again?";
+            } else if (event.error === 'network') {
+                errorMsg = "Network error during speech recognition. Please check your connection.";
+            } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                errorMsg = "Microphone access was denied. Please enable it in your browser settings.";
+            }
+            addMessage("bot", errorMsg);
+             // Don't automatically send message on error
+             inputField.value = ""; // Clear input field on error
+          };
+          recognition.onend = () => {
+            isRecognizing = false;
+            voiceButton.classList.remove('active');
+            voiceButton.title = "Speak your mind"; // Updated title
+            // Updated placeholder
+            inputField.placeholder = "How are you feeling? Type or use voice...";
+            inputField.classList.remove('listening'); // Re-add if needed for styling
+            stopMicVisualization();
+            // **Crucially, only send if there's actual input and recognition didn't error out**
+            const finalTranscript = inputField.value.trim();
+            if (finalTranscript && recognition.error === undefined) { // Check if an error occurred during this recognition cycle
+              handleSendMessage();
+            } else if (recognition.error === undefined && !finalTranscript) {
+                console.log("Recognition ended without result or error.");
+                // Optionally add a message like "Didn't catch that."
+            }
+             // Reset the error state for the next attempt
+             if(recognition) recognition.error = undefined;
+          };
+          console.log("Speech recognition setup complete.");
+        } catch (e) {
+          console.error("Error initializing SpeechRecognition:", e);
+          voiceButton.disabled = true;
+          voiceButton.title = "Speech recognition init failed.";
+        }
+      } else {
+        console.warn("Speech recognition not supported by this browser.");
+        voiceButton.disabled = true;
+        voiceButton.title = "Speech recognition not supported.";
+      }
+    }
+
+
+    // --- Other JS Functions ---
+    // toggleVoiceInput, requestMicrophoneAccess, setupAudioProcessing,
+    // processMicAudio, startMicVisualization, stopMicVisualization,
+    // cleanupAudioProcessing, startRecognitionSafely remain largely the same.
+
+    function toggleVoiceInput() {
+      if (!recognition) return;
+      if (isRecognizing) {
+        recognition.stop(); // User manually stopped
+      } else {
+        inputField.value = ""; // Clear text field before voice input
+        requestMicrophoneAccess(); // This will eventually call startRecognitionSafely
+      }
+    }
+
+    async function requestMicrophoneAccess() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.error("getUserMedia not supported");
+        addMessage("bot", "⚠️ Cannot access microphone. Please check browser permissions.");
+        // Don't try to start recognition if permission is the issue
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // We might not strictly need audio processing JUST for visualization if STT works,
+        // but it provides the level feedback. Decide if needed.
+        setupAudioProcessing(stream); // Keep for mic level viz
+        startRecognitionSafely(); // Start STT *after* getting permission
+      } catch (err) {
+        console.error("Error accessing microphone:", err);
+        addMessage("bot", `⚠️ Microphone access error: ${err.message}. Please check browser settings.`);
+        cleanupAudioProcessing(); // Clean up if permission failed
+      }
+    }
+
+    // setupAudioProcessing, processMicAudio, startMicVisualization, stopMicVisualization, cleanupAudioProcessing remain the same
+
+
+    function startRecognitionSafely() {
+      if (!recognition) {
+        console.warn("Recognition object not initialized.");
+        return;
+      }
+      try {
+        if (!isRecognizing) {
+           // Reset error state before starting
+           recognition.error = undefined;
+          recognition.start();
+        }
+      } catch (e) {
+        console.error("Error starting recognition:", e);
+        // Avoid adding duplicate messages if it's just an invalid state error
+        if (e.name !== 'InvalidStateError') {
+          addMessage("bot", "⚠️ Could not start voice recognition.");
+          cleanupAudioProcessing(); // Ensure cleanup on error
+          isRecognizing = false;
+          voiceButton.classList.remove('active');
+        } else {
+           console.warn("Recognition start attempted while already active or ending.");
+           // Might need to force stop/reset if stuck
+        }
+      }
+    }
+
+    function handleSendMessage() {
+      console.log("handleSendMessage called");
+      const message = inputField.value.trim();
+      // Only send if message is not empty
+      if (!message) {
+        console.log("Empty message, returning.");
+        return;
+      }
+
+      addMessage("user", message);
+      inputField.value = ""; // Clear input after adding user message
+      inputField.disabled = true;
+      sendButton.disabled = true;
+      voiceButton.disabled = true;
+      ventModeCheckbox.disabled = true; // Disable checkbox during processing
+      console.log("Inputs disabled");
+
+      // Use a less intrusive status message
+      showStatusMessage("MindPal is thinking...", 500); // Use updated text
+
+      // Short delay before sending to allow UI update
+      setTimeout(() => {
+        // Get vent_mode status when sending
+        const isVentMode = ventModeCheckbox.checked;
+        sendMessageToBackend(message, isVentMode);
+      }, 50);
+    }
+
+    // Modified to accept and send vent_mode status
+    function sendMessageToBackend(message, isVentMode) {
+      console.log(`sendMessageToBackend called with: "${message}", VentMode: ${isVentMode}`);
+      showTypingIndicator(); // Use the new typing indicator text
+
+      // Prepare payload
+      const payload = {
+          user_input: message,
+          // vent_mode: isVentMode // Backend expects this in JSON
+      };
+
+      // --- Choose ONE method to send based on backend expectation ---
+
+      // Method 1: Send as JSON (If backend handles JSON for text input)
+       fetch(`${backendUrl}/chat_pa`, {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         // Include vent_mode in the JSON payload
+         body: JSON.stringify({ user_input: message, vent_mode: isVentMode })
+       })
+       // .then/.catch/.finally remains the same as before
+       .then(response => {
+          console.log("Chat response status:", response.status);
+          if (!response.ok) {
+            // Improved error handling to show backend message if available
+            return response.json().then(errData => {
+               console.error("Parsed backend error:", errData);
+               const errorMsg = errData.error || errData.message || `Request failed: ${response.status}`;
+               throw new Error(errorMsg);
+            }).catch(() => { // Fallback if error JSON parsing fails
+               throw new Error(`Request failed: ${response.status} ${response.statusText}`);
+            });
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log("Chat data received:", data);
+          hideStatusMessage(); // Hide typing/thinking indicator
+          if (data.error) {
+            addMessage("bot", `Sorry, an error occurred: ${data.error}`);
+          } else {
+            addMessage("bot", data.response);
+            // Removed memory indicator update
+            playTtsAudio(data.audio_url);
+            // Removed music play call
+            // Handle crisis flag from backend if needed
+            if(data.is_crisis) {
+                console.warn("Crisis response received.");
+                // Optionally add specific UI changes for crisis
+            }
+            // Removed session end check - add back if backend sends it
+          }
+        })
+        .catch(error => {
+          console.error("Error sending message/fetching chat:", error);
+          hideStatusMessage();
+          addMessage("bot", `Connection Error: ${error.message}. Please check if MindPal is running.`);
+        })
+        .finally(() => {
+          console.log("Fetch finally block executing.");
+          // Re-enable inputs unless session ended
+          // if (!document.body.classList.contains('session-ended')) { // Add back if session end exists
+            console.log("Re-enabling inputs.");
+            inputField.disabled = false;
+            sendButton.disabled = false;
+            ventModeCheckbox.disabled = false; // Re-enable checkbox
+            if (recognition) voiceButton.disabled = false;
+            inputField.focus();
+          // } else {
+          //   console.log("Session ended class found on body, inputs remain disabled.");
+          // }
+        });
+    }
+
+    // --- addMessage remains the same ---
+    function addMessage(sender, text) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `message ${sender}`;
+      // Basic Markdown-like formatting (Bold and Italic)
+      text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Bold
+      text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');     // Italic
+      // Convert newlines from backend to <br> tags for display
+      text = text.replace(/\n/g, '<br>');
+      messageDiv.innerHTML = text;
+      chatMessages.appendChild(messageDiv);
+      // Scroll to bottom after adding message
+      setTimeout(() => chatMessages.scrollTop = chatMessages.scrollHeight, 0);
+    }
+
+
+    // --- showStatusMessage / showTypingIndicator / hideStatusMessage ---
+    function showStatusMessage(text, duration = 0) {
+      hideStatusMessage(); // Clear previous status
+      currentStatusMessage = document.createElement("div");
+      currentStatusMessage.className = `message bot status`; // Use status class
+
+      // Updated typing indicator text
+      if (text.toLowerCase().includes("thinking") || text.toLowerCase().includes("typing")) {
+        currentStatusMessage.innerHTML = `MindPal is thinking <span class="typing-indicator"><span></span><span></span><span></span></span>`;
+      } else {
+        currentStatusMessage.textContent = text; // Show other status text directly
+      }
+      statusContainer.appendChild(currentStatusMessage);
+      statusContainer.style.display = 'block'; // Make sure container is visible
+      // Scroll down to show status
+      setTimeout(() => chatMessages.scrollTop = chatMessages.scrollHeight, 0);
+
+      // Auto-hide after duration if specified
+      if (duration > 0) {
+        setTimeout(() => {
+          // Only hide if this specific message is still the current one
+          if (currentStatusMessage && currentStatusMessage.parentNode === statusContainer && currentStatusMessage.textContent.includes(text.split(" ")[0])) { // Basic check
+            hideStatusMessage();
+          }
+        }, duration);
+      }
+    }
+
+    function showTypingIndicator() {
+      showStatusMessage("MindPal is thinking..."); // Changed text
+    }
+
+    function hideStatusMessage() {
+      if (currentStatusMessage && currentStatusMessage.parentNode === statusContainer) {
+        statusContainer.removeChild(currentStatusMessage);
+      }
+      currentStatusMessage = null;
+      // Optionally hide the container if empty, or keep space
+      // statusContainer.style.display = 'none';
+    }
+
+    // --- playTtsAudio remains the same ---
+    function playTtsAudio(audioUrl) {
+      if (audioUrl) {
+        console.log("Attempting to play TTS audio:", audioUrl);
+        // Assuming backend provides relative URL from static folder
+        const fullAudioUrl = audioUrl; // Use relative path directly if served by Flask static
+        console.log("TTS Full URL:", fullAudioUrl);
+        ttsAudio.src = fullAudioUrl;
+        ttsAudio.play().then(() => console.log("TTS audio playback started successfully."))
+          .catch(e => {
+            console.error("Error initiating TTS audio playback:", e);
+            // Handle autoplay issues gracefully
+            if (e.name === 'NotAllowedError') {
+              addMessage("bot", "ℹ️ Browser blocked audio playback. Click the page to enable audio.");
+              // Add a one-time listener to enable playback on interaction
+              const enableAudio = () => {
+                 ttsAudio.play().catch(err => console.error("Error playing TTS audio after interaction:", err));
+                 document.body.removeEventListener('click', enableAudio); // Clean up listener
+              }
+              document.body.addEventListener('click', enableAudio , { once: true });
+            } else {
+              addMessage("bot", `⚠️ Could not play audio response (${e.name}). Check console for details.`);
+            }
+          });
+      } else {
+        console.log("No TTS audio URL provided.");
+      }
+    }
+
+  </script>
+</body>
+</html>
